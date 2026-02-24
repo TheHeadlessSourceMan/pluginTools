@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "pluginSystem --ls",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "pluginSystem.py",
+            "args": ["--ls"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "testPluginSystem --ls",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "tests/src/testPluginSystem/testPluginSystem.py",
+            "args": ["--ls"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "testPluginSystem --create",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "tests/src/testPluginSystem/testPluginSystem.py",
+            "args": ["--create"],
+            "console": "integratedTerminal"
+        }
+    ]
+}

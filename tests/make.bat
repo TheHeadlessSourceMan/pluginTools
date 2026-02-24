@@ -1,0 +1,1 @@
+py -m build --sdist & pip install dist/testpluginsystem-1.0.0.0.tar.gz
