@@ -1,2 +1,2 @@
-from plugin import *
-from pluginSystem import *
+from .plugin import *
+from .pluginSystem import *
