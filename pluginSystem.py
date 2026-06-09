@@ -63,7 +63,7 @@ class PluginSystem(typing.Generic[PluginType]):
 
         :instancesParameters: "pluginName":[{instande1_params},{instance2_params},{...}]
         """
-        pluginGen=createPlugins(self,instancesParameters)
+        pluginGen=createPlugins(self,instancesParameters,verbose=True)
         pluginGen=typing.cast(typing.Generator[PluginType,None,None],pluginGen)
         self._plugins=list(pluginGen)
         return self._plugins
@@ -145,7 +145,8 @@ def findInstalledPackages(
 
 
 def findPlugins(
-    pluginGroup:typing.Union[None,str,typing.Pattern,PluginSystem]=None
+    pluginGroup:typing.Union[None,str,typing.Pattern,PluginSystem]=None,
+    verbose:bool=False
     )->typing.Generator[importlib.metadata.EntryPoint,None,None]:
     """
     Find installed plugins that match a given type
@@ -157,18 +158,25 @@ def findPlugins(
             pluginGroup=pluginGroup.pluginGroup
         for entrypoint in package.entry_points:
             if pluginGroup is None:
+                if verbose:
+                    print('FOUND: '+entrypoint.name)
                 yield entrypoint
             elif isinstance(pluginGroup,str):
                 if entrypoint.group==pluginGroup:
+                    if verbose:
+                        print('FOUND: '+entrypoint.name)
                     yield entrypoint
             elif pluginGroup.match(entrypoint.group):
+                if verbose:
+                    print('FOUND: '+entrypoint.name)
                 yield entrypoint
 
 
 def createPlugins(
     pluginGroup:typing.Union[None,str,typing.Pattern,PluginSystem]=None,
     instancesParams:typing.Optional[InstancesParamsType]=None,
-    printObjectInstanciation:bool=True
+    printObjectInstanciation:bool=True,
+    verbose:bool=False
     )->typing.Generator[Plugin,None,None]:
     """
     Find installed plugins that match a given type
@@ -176,7 +184,7 @@ def createPlugins(
     """
     if instancesParams is None:
         instancesParams={}
-    for pluginInfo in findPlugins(pluginGroup):
+    for pluginInfo in findPlugins(pluginGroup,verbose):
         try:
             pluginClass=pluginInfo.load()
             if not issubclass(pluginClass,Plugin):
