@@ -51,7 +51,8 @@ class PluginSystem(typing.Generic[PluginType]):
 
     def findPlugins(self)->typing.Iterable[importlib.metadata.EntryPoint]:
         """
-        Scan (but do not create instances of) all installed plugins that belong to this system
+        Scan (but do not create instances of) all installed plugins
+        that belong to this system
         """
         yield from findPlugins(self)
 
@@ -59,9 +60,11 @@ class PluginSystem(typing.Generic[PluginType]):
         instancesParameters:typing.Optional[InstancesParamsType]=None
         )->typing.Iterable[PluginType]:
         """
-        Scan, and create instances of, all installed plugins that belong to this system
+        Scan, and create instances of, all installed plugins
+        that belong to this system
 
-        :instancesParameters: "pluginName":[{instande1_params},{instance2_params},{...}]
+        :instancesParameters: "pluginName":[
+            {instande1_params},{instance2_params},{...}]
         """
         pluginGen=createPlugins(self,instancesParameters,verbose=True)
         pluginGen=typing.cast(typing.Generator[PluginType,None,None],pluginGen)
@@ -107,7 +110,7 @@ class PluginSystem(typing.Generic[PluginType]):
 
 def registerPlugin(
     plugin:Plugin,
-    system:PluginSystem,
+    system:PluginSystem[PluginType],
     context:typing.Optional[typing.Any]=None):
     """
     Register a plugin with a system.
@@ -122,14 +125,14 @@ def registerPlugin(
 
 def unRegisterPlugin(
     plugin:Plugin,
-    system:PluginSystem,
+    system:PluginSystem[PluginType],
     context:typing.Optional[typing.Any]=None):
     """
     unregister a plugin if it is going away
     """
 
 def findInstalledPackages(
-    name:typing.Union[None,str,typing.Pattern]=None
+    name:typing.Union[None,str,typing.Pattern[str]]=None
     )->typing.Generator[importlib.metadata.Distribution,None,None]:
     """
     Find installed packages that match a given name
@@ -145,7 +148,8 @@ def findInstalledPackages(
 
 
 def findPlugins(
-    pluginGroup:typing.Union[None,str,typing.Pattern,PluginSystem]=None,
+    pluginGroup:typing.Union[
+        None,str,typing.Pattern[str],PluginSystem[PluginType]]=None,
     verbose:bool=False
     )->typing.Generator[importlib.metadata.EntryPoint,None,None]:
     """
@@ -173,7 +177,8 @@ def findPlugins(
 
 
 def createPlugins(
-    pluginGroup:typing.Union[None,str,typing.Pattern,PluginSystem]=None,
+    pluginGroup:typing.Union[
+        None,str,typing.Pattern[str],PluginSystem[PluginType]]=None,
     instancesParams:typing.Optional[InstancesParamsType]=None,
     printObjectInstanciation:bool=True,
     verbose:bool=False
@@ -188,13 +193,14 @@ def createPlugins(
         try:
             pluginClass=pluginInfo.load()
             if not issubclass(pluginClass,Plugin):
-                raise TypeError(f'Expected class {Plugin}, got class {pluginClass}')
+                raise TypeError(f'Expected class {Plugin}, got class {pluginClass}') # noqa: E501
             instanceParams=instancesParams.get(pluginInfo.name,None)
             if instanceParams is None:
                 if issubclass(pluginClass,SingletonPlugin):
-                    # just because there are no params, doesn't mean we shouldn't create it!
+                    # just because there are no params, doesn't mean
+                    # we shouldn't create it!
                     # We want one instance with no params.
-                    instanceParams=[{}]
+                    instanceParams=[{}] # type: ignore
                 else:
                     continue
             if isinstance(instanceParams,dict):
@@ -202,13 +208,15 @@ def createPlugins(
             instanceParams=typing.cast(InstanceParamsType,instanceParams)
             for instanceParamDict in instanceParams:
                 if printObjectInstanciation:
-                    paramsList=', '.join([f'{k}={repr(v)}' for k,v in instanceParamDict.items()])
-                    print(f"CREATE PLUGIN: {pluginClass.__name__}({paramsList})")
+                    paramsList=', '.join([
+                        f'{k}={repr(v)}'
+                        for k,v in instanceParamDict.items()])
+                    print(f"CREATE PLUGIN: {pluginClass.__name__}({paramsList})") # noqa: E501
                 yield pluginClass(**instanceParamDict)
         except Exception:
             import traceback
             errStr=traceback.format_exc()
-            print(f'Unable to create plugin {pluginInfo.name} due to error:\n{errStr}')
+            print(f'Unable to create plugin {pluginInfo.name} due to error:\n{errStr}') # noqa: E501
 
 
 # -------------- Main entry point
