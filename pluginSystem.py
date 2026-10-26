@@ -57,7 +57,8 @@ class PluginSystem(typing.Generic[PluginType]):
         yield from findPlugins(self)
 
     def createPlugins(self,
-        instancesParameters:typing.Optional[InstancesParamsType]=None
+        instancesParameters:typing.Optional[InstancesParamsType]=None,
+        verbose:bool=False,
         )->typing.Iterable[PluginType]:
         """
         Scan, and create instances of, all installed plugins
@@ -66,7 +67,7 @@ class PluginSystem(typing.Generic[PluginType]):
         :instancesParameters: "pluginName":[
             {instande1_params},{instance2_params},{...}]
         """
-        pluginGen=createPlugins(self,instancesParameters,verbose=True)
+        pluginGen=createPlugins(self,instancesParameters,verbose=verbose)
         pluginGen=typing.cast(typing.Generator[PluginType,None,None],pluginGen)
         self._plugins=list(pluginGen)
         return self._plugins
@@ -122,6 +123,8 @@ def registerPlugin(
 
     NOTE: one plugin may call RegisterPlugin several times for a single system.
     """
+    _=plugin,system,context
+    raise NotImplementedError("Registering plugins is not implemented.")
 
 def unRegisterPlugin(
     plugin:Plugin,
@@ -130,6 +133,8 @@ def unRegisterPlugin(
     """
     unregister a plugin if it is going away
     """
+    _=plugin,system,context
+    raise NotImplementedError("Unregistering plugins is not implemented.")
 
 def findInstalledPackages(
     name:typing.Union[None,str,typing.Pattern[str]]=None
